@@ -13,6 +13,8 @@ from email.utils import formataddr, parsedate_to_datetime
 from zoneinfo import ZoneInfo
 import requests
 from dotenv import load_dotenv
+from agent.summarise import process_articles
+
 
 # --- Import AI filter (from ai_agent.py) ---
 from agent.ai_agent import enrich_with_ai as enrich_news_data
@@ -392,54 +394,57 @@ with pd.ExcelWriter(filename, engine="openpyxl") as writer:
 logger.info(f"✅ Saved enriched results with metadata sheet: {filename}")
 
 # ---------------- EMAIL SENDING VIA SMTP ---------------- #
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 465
-SENDER_EMAIL = "synapsebiopharma@gmail.com"
-SENDER_NAME = "Vedolizumab Bot"
+# SMTP_SERVER = "smtp.gmail.com"
+# SMTP_PORT = 465
+# SENDER_EMAIL = "synapsebiopharma@gmail.com"
+# SENDER_NAME = "Vedolizumab Bot"
 
-# FIX #8: Fail loudly if EMAIL_PASSWORD is missing instead of passing None
-# to smtplib and getting a cryptic TypeError at login time.
-PASSWORD = os.getenv("EMAIL_PASSWORD")
-if not PASSWORD:
-    raise EnvironmentError(
-        "❌ EMAIL_PASSWORD environment variable is not set. "
-        "Add it to your .env file or export it before running this script."
-    )
+# # FIX #8: Fail loudly if EMAIL_PASSWORD is missing instead of passing None
+# # to smtplib and getting a cryptic TypeError at login time.
+# PASSWORD = os.getenv("EMAIL_PASSWORD")
+# if not PASSWORD:
+#     raise EnvironmentError(
+#         "❌ EMAIL_PASSWORD environment variable is not set. "
+#         "Add it to your .env file or export it before running this script."
+#     )
 
-recipients = [
-    "krishna@synapsebiopharma.com",
-    "utkarsh@synapsebiopharma.com",
-    "diksha@synapsebiopharma.com",
-    "dipanshi@synapsebiopharma.com",
-    "navita@synapsebiopharma.com",
-    "satish@synapsebiopharma.com"
-]
+# recipients = [
+#     "krishna@synapsebiopharma.com",
+#     # "utkarsh@synapsebiopharma.com",
+#     # "diksha@synapsebiopharma.com",
+#     "dipanshi@synapsebiopharma.com",
+#     # "navita@synapsebiopharma.com",
+#     # "satish@synapsebiopharma.com"
+# ]
 
-msg = EmailMessage()
-msg["From"] = formataddr((SENDER_NAME, SENDER_EMAIL))
-msg["To"] = ", ".join(recipients)
-msg["Subject"] = f"Daily Pharma News Report - {timestamp}"
-msg.set_content("Attached are the pharma news reports:\n\n- Raw Results\n- AI Enriched Results")
+# msg = EmailMessage()
+# msg["From"] = formataddr((SENDER_NAME, SENDER_EMAIL))
+# msg["To"] = ", ".join(recipients)
+# msg["Subject"] = f"Daily Pharma News Report - {timestamp}"
+# msg.set_content("Attached are the pharma news reports:\n\n- Raw Results\n- AI Enriched Results")
 
-# Attach both Excel files — guard against missing files explicitly
-for file in [raw_filename, filename]:
-    if not os.path.exists(file):
-        logger.error(f"❌ Attachment file not found, skipping: {file}")
-        continue
-    with open(file, "rb") as f:
-        file_data = f.read()
-    msg.add_attachment(
-        file_data,
-        maintype="application",
-        subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename=os.path.basename(file)
-    )
+# # Attach both Excel files — guard against missing files explicitly
+# for file in [raw_filename, filename]:
+#     if not os.path.exists(file):
+#         logger.error(f"❌ Attachment file not found, skipping: {file}")
+#         continue
+#     with open(file, "rb") as f:
+#         file_data = f.read()
+#     msg.add_attachment(
+#         file_data,
+#         maintype="application",
+#         subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+#         filename=os.path.basename(file)
+#     )
 
-try:
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
-        server.login(SENDER_EMAIL, PASSWORD)
-        server.send_message(msg)
-    logger.info("✅ Email sent successfully with raw + enriched reports!")
-except Exception as e:
-    logger.exception(f"❌ Error sending email via SMTP: {e}")
+# try:
+#     context = ssl.create_default_context()
+#     with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
+#         server.login(SENDER_EMAIL, PASSWORD)
+#         server.send_message(msg)
+#     logger.info("✅ Email sent successfully with raw + enriched reports!")
+# except Exception as e:
+#     logger.exception(f"❌ Error sending email via SMTP: {e}")
+
+logger.info("📧 Running summarise.py...")
+process_articles("news_results.xlsx")
