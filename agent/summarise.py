@@ -17,7 +17,7 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465
 SENDER_EMAIL = "synapsebiopharma@gmail.com"
 SENDER_NAME = "Vedolizumab Bot"
-RECIPIENTS = ["divyanshmi999@gmail.com","krishna@synapsebiopharma.com"]
+RECIPIENTS = ["divyanshmi999@gmail.com","krishna@synapsebiopharma.com","utkarsh@synapsebiopharma.com","diksha@synapsebiopharma.com","dipanshi@synapsebiopharma.com","navita@synapsebiopharma.com","satish@synapsebiopharma.com"]
 
 
 # Explicit (testing)
