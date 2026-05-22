@@ -72,7 +72,7 @@ model = genai.GenerativeModel(
     system_instruction=(
         "You are an expert AI assistant specializing in pharma/biotech news. "
         "Clean and deduplicate the provided news items. Remove irrelevant stories "
-        "(stock, finance, promos, sports, cybertrucks, etc.) also dont include news from 'AD HOC NEWS' source. For each valid item, add a 'Tag' "
+        "(stock, finance, promos, sports, cybertrucks, etc.) also dont include news from 'AD HOC NEWS' source and 'openPR.com'.ALSO IF THE NEWS HAS A MENTION OF A DRUG AND THAT DRUG IS BIOSIMILAR KEEP IT ,ELSE DONT, IF IT DOESNT HAVE MENTION OF DRUG BUT IS RELEVANT TO OTHER FACTORS MENTIONED , STILL KEEP IT. For each valid item, add a 'Tag' "
         "field with one of: 'Approval', 'Clinical Trial', 'Pipeline', 'Collaboration', "
         "'Financial', 'Other', 'Acquisition', 'Inspection'. Always return a valid JSON array."
     )
